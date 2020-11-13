@@ -2,6 +2,7 @@ package httpadapt
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 
@@ -33,13 +34,12 @@ func (a *Adapter) ProxyWithContext(
 	ctx context.Context,
 	ev events.APIGatewayProxyRequest,
 ) (out events.APIGatewayProxyResponse, err error) {
-
 	req, err := a.EventToRequest(ev)
 	if err != nil {
-		return out, err
+		return out, fmt.Errorf("failed to create request from event: %w", err)
 	}
 
 	rec := httptest.NewRecorder()
-	a.h.ServeHTTP(rec, req) // call the implemention
+	a.h.ServeHTTP(rec, withContext(ctx, req, ev)) // call the implemention
 	return ProxyResponse(rec), nil
 }
