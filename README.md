@@ -14,6 +14,8 @@ Adapt a http.Handler to a Lambda Gateway Event handler
 - [ ] Add a functional option for CustomHostVariable env
 - [ ] Consider the v2 api format
 - [ ] Add support for non base64 encoded bodies
+- [ ] Prevent header from being edited after writing with Write, else it will work on lambda but
+       not in a real server
 
 ## existing
 - [ ] https://github.com/apex/gateway

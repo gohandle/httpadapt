@@ -3,6 +3,7 @@ package httpadapt
 import (
 	"context"
 	"net/http"
+	"net/http/httptest"
 
 	"github.com/aws/aws-lambda-go/events"
 )
@@ -38,13 +39,7 @@ func (a *Adapter) ProxyWithContext(
 		return out, err
 	}
 
-	w := NewResponseWriter()
-	a.h.ServeHTTP(w, req)
-
-	out, err = w.ProxyResponse()
-	if err != nil {
-		return out, err
-	}
-
-	return
+	rec := httptest.NewRecorder()
+	a.h.ServeHTTP(rec, req)
+	return ProxyResponse(rec)
 }

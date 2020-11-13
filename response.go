@@ -1,31 +1,34 @@
 package httpadapt
 
 import (
-	"bytes"
+	"encoding/base64"
 	"net/http"
+	"net/http/httptest"
+	"unicode/utf8"
 
 	"github.com/aws/aws-lambda-go/events"
 )
 
-// ResponseWriter buffers response bytes
-type ResponseWriter struct{ buf *bytes.Buffer }
-
-// NewResponseWriter creates a writer that implements http.ResponseWriter that buffers the
-// response body to be send as a response to the lambda proxy event
-func NewResponseWriter() *ResponseWriter {
-	return &ResponseWriter{buf: bytes.NewBuffer(nil)}
-}
-
-// WriteHeader sends an HTTP response header with the provided status code.
-func (w *ResponseWriter) WriteHeader(statusCode int) {}
-
-// Header returns the header map that will be sent by WriteHeader.
-func (w *ResponseWriter) Header() (h http.Header) { return }
-
-// Write writes the data to the connection as part of an HTTP reply.
-func (w *ResponseWriter) Write(b []byte) (int, error) { return w.buf.Write(b) }
-
 // ProxyResponse returns the resulting response to handling the API Gateway Proxy event
-func (w *ResponseWriter) ProxyResponse() (out events.APIGatewayProxyResponse, err error) {
+func ProxyResponse(rec *httptest.ResponseRecorder) (out events.APIGatewayProxyResponse, err error) {
+
+	// if the content type header is not set when we write the body we try to
+	// detect one and set it by default. If the content type cannot be detected
+	// it is automatically set to "application/octet-stream" by the
+	// DetectContentType method
+	if rec.Result().Header.Get("Content-Type") == "" {
+		rec.Result().Header.Add("Content-Type", http.DetectContentType(
+			rec.Body.Bytes(),
+		))
+	}
+
+	out.StatusCode = rec.Result().StatusCode
+	out.MultiValueHeaders = rec.Result().Header
+	out.Body = string(rec.Body.Bytes())
+	if !utf8.Valid(rec.Body.Bytes()) {
+		out.Body = base64.StdEncoding.EncodeToString(rec.Body.Bytes())
+		out.IsBase64Encoded = true
+	}
+
 	return
 }
