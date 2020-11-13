@@ -8,9 +8,11 @@ import (
 
 func TestAdapt(t *testing.T) {
 	ctx := context.Background()
+	ctx = context.WithValue(ctx, "foo", "bar")
+
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Context() != ctx {
-			t.Fatalf("should have been passed the context")
+		if r.Context().Value("foo").(string) != "bar" {
+			t.Fatalf("should been passed the original context")
 		}
 
 		w.WriteHeader(415)
