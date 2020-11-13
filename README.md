@@ -1,5 +1,15 @@
 # httpadapt
-Adapt a http.Handler to a Lambda Gateway Event handler
+Adapt a http.Handler to handle API Gateway Proxy events in AWS Lambda. This library started as 
+simple fork of the  blessed `https://github.com/awslabs/aws-lambda-go-api-proxy` library but in the
+end so much was changed that only very little of the original codebase remains.
+
+## features
+- This library only depends on the standard library and `github.com/aws/aws-lambda-go`
+- We removed all support for non-context based HTT handling to vastly simply the code base
+- Only works with the standard http.Handler interface
+- Query parameters aren now ordered deterministicly instead of randomly
+- Instead of writing our own ResponseWriter we use the battle tested httptest.ResponseRecorder 
+- Well tested with coverage of over 95%
 
 ## usage
 
@@ -23,12 +33,6 @@ func main() {
 		httpadapt.New(http.HandlerFunc(handle)).ProxyWithContext)
 }
 ```
-
-## features
-- Stdlib and lambda event deps only
-- Only supports context based handling
-- Deterministic query params order
-- Battle tested httptest.ResponseRecorder to record the response
 
 ## backlog
 - [x] Add a functional option to configure stripbasepath
