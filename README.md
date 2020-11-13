@@ -1,23 +1,39 @@
 # httpadapt
 Adapt a http.Handler to a Lambda Gateway Event handler
 
+## usage
+
+```Go
+package main
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/gohandle/httpadapt"
+)
+
+func handle(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "hello, %v", r.URL)
+}
+
+func main() {
+	lambda.Start(
+		httpadapt.New(http.HandlerFunc(handle)).ProxyWithContext)
+}
+```
+
 ## features
 - Stdlib and lambda event deps only
-- Configurable logging
 - Only supports context based handling
 - Deterministic query params order
 - Battle tested httptest.ResponseRecorder to record the response
 
 ## backlog
+- [x] Add a functional option to configure stripbasepath
+- [x] Add a functional option for CustomHostVariable env
 - [ ] Test errors, possiblty with a package error type
-- [ ] Add an functional option to configure a logger
-- [ ] Add a functional option to configure stripbasepath
-- [ ] Add a functional option for CustomHostVariable env
 - [ ] Consider the v2 api format
-- [ ] Add support for non base64 encoded bodies
-- [ ] Prevent header from being edited after writing with Write, else it will work on lambda but
-       not in a real server
-
-## existing
-- [ ] https://github.com/apex/gateway
-- [ ] https://github.com/akrylysov/algnhsa
+- [x] Prevent header from being edited after writing with Write, else it will work on lambda but 
+      not in a real server
