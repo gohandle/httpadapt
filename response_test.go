@@ -1,7 +1,6 @@
 package httpadapt
 
 import (
-	"errors"
 	"net/http/httptest"
 	"reflect"
 	"strconv"
@@ -38,13 +37,18 @@ func TestResponse(t *testing.T) {
 			MultiValueHeaders: map[string][]string{"Content-Type": {"text/plain; charset=utf-8"}},
 			IsBase64Encoded:   true,
 		}},
+
+		{rec: buildResp(t, //write header after write body
+			respWrite([]byte("foo")),
+			respHeaderSet(map[string][]string{"foo": {"bar"}}),
+		), exp: events.APIGatewayProxyResponse{
+			StatusCode:        200,
+			Body:              "foo",
+			MultiValueHeaders: map[string][]string{"Content-Type": {"text/plain; charset=utf-8"}},
+		}},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			out, err := ProxyResponse(c.rec)
-			if !errors.Is(err, c.expErr) {
-				t.Fatalf("got: %v exp: %v", err, c.expErr)
-			}
-
+			out := ProxyResponse(c.rec)
 			if !reflect.DeepEqual(out, c.exp) {
 				t.Fatalf("got: %v exp: %v", out, c.exp)
 			}

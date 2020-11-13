@@ -10,7 +10,7 @@ import (
 )
 
 // ProxyResponse returns the resulting response to handling the API Gateway Proxy event
-func ProxyResponse(rec *httptest.ResponseRecorder) (out events.APIGatewayProxyResponse, err error) {
+func ProxyResponse(rec *httptest.ResponseRecorder) (out events.APIGatewayProxyResponse) {
 
 	// if the content type header is not set when we write the body we try to
 	// detect one and set it by default. If the content type cannot be detected

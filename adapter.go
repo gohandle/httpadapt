@@ -40,6 +40,6 @@ func (a *Adapter) ProxyWithContext(
 	}
 
 	rec := httptest.NewRecorder()
-	a.h.ServeHTTP(rec, req)
-	return ProxyResponse(rec)
+	a.h.ServeHTTP(rec, req) // call the implemention
+	return ProxyResponse(rec), nil
 }

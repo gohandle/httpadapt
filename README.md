@@ -6,6 +6,7 @@ Adapt a http.Handler to a Lambda Gateway Event handler
 - Configurable logging
 - Only supports context based handling
 - Deterministic query params order
+- Battle tested httptest.ResponseRecorder to record the response
 
 ## backlog
 - [ ] Test errors, possiblty with a package error type
