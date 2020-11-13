@@ -6,8 +6,8 @@ end so much was changed that only very little of the original codebase remains.
 ## features
 - This library only depends on the standard library and `github.com/aws/aws-lambda-go`
 - We removed all support for non-context based HTT handling to vastly simply the code base
-- Only works with the standard http.Handler interface
-- Query parameters aren now ordered deterministicly instead of randomly
+- Only supports the standard http.Handler interface to vastly simplify the code
+- Query parameters aren now ordered deterministicly instead
 - Instead of writing our own ResponseWriter we use the battle tested httptest.ResponseRecorder 
 - Well tested with coverage of over 95%
 
