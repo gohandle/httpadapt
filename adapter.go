@@ -1,6 +1,11 @@
 package httpadapt
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+
+	"github.com/aws/aws-lambda-go/events"
+)
 
 // Adapter adapts http.Handler implementations.
 type Adapter struct {
@@ -15,6 +20,30 @@ func New(h http.Handler, opts ...Option) (a *Adapter) {
 	a = &Adapter{h: h}
 	for _, opt := range opts {
 		opt(a)
+	}
+
+	return
+}
+
+// ProxyWithContext receives context and an API Gateway proxy event,
+// transforms them into an http.Request object, and sends it to the http.Handler for routing.
+// It returns a proxy response object generated from the http.ResponseWriter.
+func (a *Adapter) ProxyWithContext(
+	ctx context.Context,
+	ev events.APIGatewayProxyRequest,
+) (out events.APIGatewayProxyResponse, err error) {
+
+	req, err := a.EventToRequest(ev)
+	if err != nil {
+		return out, err
+	}
+
+	w := NewResponseWriter()
+	a.h.ServeHTTP(w, req)
+
+	out, err = w.ProxyResponse()
+	if err != nil {
+		return out, err
 	}
 
 	return
