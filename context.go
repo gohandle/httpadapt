@@ -8,14 +8,19 @@ import (
 	"github.com/aws/aws-lambda-go/lambdacontext"
 )
 
-// withContext returns the httpRequest with gateway context and lambda context added
-func withContext(ctx context.Context, req *http.Request, apiGwRequest events.APIGatewayProxyRequest) *http.Request {
+// WithContext returns a context with gateway context and lamda context added (if any)
+func WithContext(ctx context.Context, apiGwRequest events.APIGatewayProxyRequest) context.Context {
 	lc, _ := lambdacontext.FromContext(ctx)
-	return req.WithContext(context.WithValue(ctx, contextKey{}, requestContext{
+	return context.WithValue(ctx, contextKey{}, requestContext{
 		lambdaContext:       lc,
 		gatewayProxyContext: apiGwRequest.RequestContext,
 		stageVars:           apiGwRequest.StageVariables,
-	}))
+	})
+}
+
+// withContext returns the httpRequest with gateway context and lambda context added
+func withContext(ctx context.Context, req *http.Request, apiGwRequest events.APIGatewayProxyRequest) *http.Request {
+	return req.WithContext(WithContext(ctx, apiGwRequest))
 }
 
 // GetAPIGatewayContextFromContext retrieve APIGatewayProxyRequestContext from context.Context
